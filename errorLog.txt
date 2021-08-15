@@ -1,0 +1,344 @@
+- Loading the configuration file.
+
+- Check the proxy settings.
+- No proxy settings...
+
+- Load target files.
+- The targets are as follows:
+-- License.txt
+-- LICENSE.txt
+-- LICENSE
+-- License
+-- LICENSE.md
+-- License.md
+
+- Load NugetPackageList.txt.
+-- Microsoft.EntityFrameworkCore 5.0.9.
+-- Polly 7.2.2.
+-- NLog 4.7.10.
+-- AutoMapper 10.1.1.
+-- System.Drawing.Common 5.0.2.
+-- Microsoft.Win32.SystemEvents 5.0.0.
+-- NUnit 3.13.2.
+-- Newtonsoft.Json 13.0.1.
+-- FluentAssertions 5.10.3.
+-- Microsoft.IdentityModel.Clients.ActiveDirectory 5.2.9.
+-- Microsoft.Extensions.Hosting 5.0.0.
+-- System.Text.Json 5.0.2.
+-- Microsoft.Extensions.DependencyInjection 5.0.2.
+-- Moq 4.16.1.
+-- xunit 2.4.1.
+-- Microsoft.Extensions.Logging 5.0.0.
+-- System.Diagnostics.PerformanceCounter 5.0.1.
+-- Swashbuckle.AspNetCore 6.1.5.
+-- Swashbuckle.AspNetCore.SwaggerGen 6.1.5.
+-- Microsoft.ApplicationInsights 2.18.0.
+-- Azure.Storage.Blobs 12.9.1.
+-- Microsoft.Extensions.Http 5.0.0.
+-- Serilog.Sinks.File 5.0.0.
+-- Newtonsoft.Json.Bson 1.0.2.
+-- AWSSDK.Core 3.7.2.3.
+-- Swashbuckle.AspNetCore.SwaggerUI 6.1.5.
+-- Microsoft.Bcl.AsyncInterfaces 5.0.0.
+-- Castle.Core 4.4.1.
+-- Autofac 6.2.0.
+-- Swashbuckle.AspNetCore.Swagger 6.1.5.
+-- Microsoft.Identity.Client 4.35.1.
+-- EntityFramework 6.4.4.
+-- Microsoft.AspNet.Mvc 5.2.7.
+-- Serilog 2.10.0.
+-- jQuery 3.6.0.
+-- Serilog.Extensions.Logging 3.0.1.
+
+*********************************************************
+ Microsoft.EntityFrameworkCore 5.0.9
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+-- Successfully retrieved the gitHub URL. dotnet/efcore
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/dotnet/efcore/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/dotnet/efcore/contents/LICENSE.txt.
+
+-- Succeeded in retrieving the file.
+
+-- Microsoft.EntityFrameworkCore license file created or overwrited.
+
+*********************************************************
+ Polly 7.2.2
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since projectUrl holds the URL of GitHub, process will use it.
+-- Successfully retrieved the gitHub URL. App-vNext/Polly
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/App-vNext/Polly/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/App-vNext/Polly/contents/LICENSE.txt.
+
+-- Succeeded in retrieving the file.
+
+-- Polly license file created or overwrited.
+
+*********************************************************
+ NLog 4.7.10
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+-- Successfully retrieved the gitHub URL. NLog/NLog.git
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/NLog/NLog.git/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/NLog/NLog.git/contents/LICENSE.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.
+--- Send Get request https://api.github.com/repos/NLog/NLog.git/contents/LICENSE.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.
+--- Send Get request https://api.github.com/repos/NLog/NLog.git/contents/License.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.md.
+--- Send Get request https://api.github.com/repos/NLog/NLog.git/contents/LICENSE.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.md.
+--- Send Get request https://api.github.com/repos/NLog/NLog.git/contents/License.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+*********************************************************
+ AutoMapper 10.1.1
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+-- Successfully retrieved the gitHub URL. AutoMapper/AutoMapper
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/AutoMapper/AutoMapper/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/AutoMapper/AutoMapper/contents/LICENSE.txt.
+
+-- Succeeded in retrieving the file.
+
+-- AutoMapper license file created or overwrited.
+
+*********************************************************
+ System.Drawing.Common 5.0.2
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since projectUrl holds the URL of GitHub, process will use it.
+-- Successfully retrieved the gitHub URL. dotnet/runtime
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/LICENSE.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/LICENSE.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/License.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.md.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/LICENSE.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.md.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/License.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+*********************************************************
+ Microsoft.Win32.SystemEvents 5.0.0
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since projectUrl holds the URL of GitHub, process will use it.
+-- Successfully retrieved the gitHub URL. dotnet/runtime
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/LICENSE.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/LICENSE.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/License.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.md.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/LICENSE.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.md.
+--- Send Get request https://api.github.com/repos/dotnet/runtime/contents/License.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+*********************************************************
+ NUnit 3.13.2
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+-- Successfully retrieved the gitHub URL. nunit/nunit
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/nunit/nunit/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/nunit/nunit/contents/LICENSE.txt.
+
+-- Succeeded in retrieving the file.
+
+-- NUnit license file created or overwrited.
+
+*********************************************************
+ Newtonsoft.Json 13.0.1
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+-- Successfully retrieved the gitHub URL. JamesNK/Newtonsoft.Json
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/JamesNK/Newtonsoft.Json/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/JamesNK/Newtonsoft.Json/contents/LICENSE.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.
+--- Send Get request https://api.github.com/repos/JamesNK/Newtonsoft.Json/contents/LICENSE.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.
+--- Send Get request https://api.github.com/repos/JamesNK/Newtonsoft.Json/contents/License.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.md.
+--- Send Get request https://api.github.com/repos/JamesNK/Newtonsoft.Json/contents/LICENSE.md.
+
+-- Succeeded in retrieving the file.
+
+-- Newtonsoft.Json license file created or overwrited.
+
+*********************************************************
+ FluentAssertions 5.10.3
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+-- Successfully retrieved the gitHub URL. fluentassertions/fluentassertions.git
+
+--- Attempt to retrieve License.txt.
+--- Send Get request https://api.github.com/repos/fluentassertions/fluentassertions.git/contents/License.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.txt.
+--- Send Get request https://api.github.com/repos/fluentassertions/fluentassertions.git/contents/LICENSE.txt.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.
+--- Send Get request https://api.github.com/repos/fluentassertions/fluentassertions.git/contents/LICENSE.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.
+--- Send Get request https://api.github.com/repos/fluentassertions/fluentassertions.git/contents/License.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve LICENSE.md.
+--- Send Get request https://api.github.com/repos/fluentassertions/fluentassertions.git/contents/LICENSE.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+--- Attempt to retrieve License.md.
+--- Send Get request https://api.github.com/repos/fluentassertions/fluentassertions.git/contents/License.md.
+--- Response Status code :NotFound.
+--- Skip the process.
+
+*********************************************************
+ Microsoft.IdentityModel.Clients.ActiveDirectory 5.2.9
+*********************************************************
+
+- Load package manifest.
+- Get project URL.
+-- Since the projectUrl does not contain the GitHub URL,
+     process will try to get it from the repository's url attribute.
+An error has occurred. Message:Sequence contains no elements
+- Press any key to exit...
