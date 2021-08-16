@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -28,7 +29,7 @@ namespace ListNugetLicense
         {
             try
             {
-                Console.WriteLine("- Loading the configuration file.");
+                Console.WriteLine("* Loading the configuration file.");
 
                 //
                 // Install the following packages
@@ -44,7 +45,7 @@ namespace ListNugetLicense
                 var appSettingConfiguration = appSettingBuilder.Build();
 
                 Console.WriteLine($"");
-                Console.WriteLine("- Check the proxy settings.");
+                Console.WriteLine("* Check the proxy settings.");
 
                 HttpClient client = null;
                 var proxySetting = appSettingConfiguration.GetSection("Proxy");
@@ -52,7 +53,7 @@ namespace ListNugetLicense
 
                 if (!string.IsNullOrEmpty(proxyHost))
                 {
-                    Console.WriteLine("- Load the proxy settings.");
+                    Console.WriteLine("* Load the proxy settings.");
 
                     var proxyPort = proxySetting["Port"]?.ToString();
                     var proxyUser = proxySetting["UserName"]?.ToString();
@@ -64,13 +65,13 @@ namespace ListNugetLicense
                     clientHandler.Proxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
                     clientHandler.UseProxy = true;
 
-                    Console.WriteLine("- Generate a client with proxy settings...");
+                    Console.WriteLine("* Generate a client with proxy settings...");
 
                     client = new HttpClient(clientHandler);
                 }
                 else
                 {
-                    Console.WriteLine("- No proxy settings...");
+                    Console.WriteLine("* No proxy settings...");
 
                     client = new HttpClient();
                 }
@@ -80,29 +81,34 @@ namespace ListNugetLicense
                 client.DefaultRequestHeaders.Add("Authorization", $"token {token}");
 
                 Console.WriteLine($"");
-                Console.WriteLine("- Load target files.");
+                Console.WriteLine("* Load target files.");
                 var targetFiles = appSettingConfiguration.GetSection("TargetFiles:FileName").Get<List<string>>();
 
                 if (targetFiles.Count == 0)
                 {
-                    Console.WriteLine("- There is no target. Terminate the process.");
-                    Console.WriteLine("- Press any key to exit...");
+                    Console.WriteLine("* There is no target. Terminate the process.");
+                    Console.WriteLine("* Press any key to exit...");
                     Console.ReadKey();
                     return;
                 }
-                else if (targetFiles.Count > 60)
+                else if ((targetFiles.Count > 60) && (string.IsNullOrEmpty(token)))
                 {
-                    Console.WriteLine("- Detected over 60 files..");
+                    Console.WriteLine("* Detected over 60 files. If you do not have a token, you will be trapped by the rate limit.");
+                    Console.WriteLine("* Put the token in appsetting.json.");
+                    Console.WriteLine("* Press any key to exit.");
+                    Console.ReadKey();
+                    return;
                 }
 
-                Console.WriteLine("- The targets are as follows:");
+                var notFoundList = new List<string>();
+                Console.WriteLine("* The targets are as follows:");
                 foreach (var item in targetFiles)
                 {
-                    Console.WriteLine($"-- {item}");
+                    Console.WriteLine($"** {item}");
                 }
 
                 Console.WriteLine($"");
-                Console.WriteLine($"- Load {InputFileName}.");
+                Console.WriteLine($"* Load {InputFileName}.");
                 var packageDictionary = new Dictionary<string, string>();
 
                 using (var sr = new StreamReader(Path.Combine(currentDirectoryPath, InputFileName)))
@@ -119,14 +125,15 @@ namespace ListNugetLicense
                             {
                                 if (version.Equals(dictValue))
                                 {
-                                    Console.WriteLine($"-- {name} {version} has already been added.");
+                                    Console.WriteLine($"** {name} {version} has already been added.");
                                     continue;
                                 }
                             }
                         }
 
                         packageDictionary.Add(name, version);
-                        Console.WriteLine($"-- {name} {version}.");
+                        notFoundList.Add(name);
+                        Console.WriteLine($"** {name} {version}.");
                     }
                 }
 
@@ -141,55 +148,70 @@ namespace ListNugetLicense
                     Console.WriteLine($"*********************************************************");
                     Console.WriteLine($"");
 
-                    Console.WriteLine($"- Load package manifest.");
+                    Console.WriteLine($"* Load package manifest.");
                     var nuspecXml = XDocument.Load(nugetUrl + $"{packageId}/{packageVersion}/{packageId}.nuspec");
 
-                    Console.WriteLine($"- Get project URL.");
+                    Console.WriteLine($"* Get project URL.");
                     var projectUrl = (string)nuspecXml.Root.Descendants(nuspecNamespace + "projectUrl").FirstOrDefault();
+                    var repositoryUrl =
+                        (string)nuspecXml.Root.Descendants(nuspecNamespace + "repository").FirstOrDefault()?.Attribute("url");
 
-                    string repositoryUrlForApi;
-                    string repositoryUrl;
-                    if (string.IsNullOrEmpty(projectUrl) || !projectUrl.Contains("github.com"))
+                    string repositoryUrlForApi = null;
+                    string redirectedUrl = null;
+
+                    if (string.IsNullOrEmpty(repositoryUrl) || !repositoryUrl.Contains("http"))
                     {
-                        Console.WriteLine($"-- Since the projectUrl does not contain the GitHub URL,");
-                        Console.WriteLine($"     process will try to get it from the repository's url attribute.");
-
-                        repositoryUrl =
-                            (string)nuspecXml.Root.Descendants(nuspecNamespace + "repository").FirstOrDefault()?.Attribute("url");
-
-                        if (string.IsNullOrEmpty(repositoryUrl) || !repositoryUrl.Contains("github.com"))
+                        if (string.IsNullOrEmpty(projectUrl) || !projectUrl.Contains("http"))
                         {
-                            Console.WriteLine($"--- Repository URL :{repositoryUrl}.");
-                            Console.WriteLine("--- Only github is supported. Skip the process.");
+                            Console.WriteLine($"** repository and project URL is null or empty or not http.");
                             continue;
                         }
 
-                        repositoryUrlForApi = repositoryUrl.Split("github.com").Last().Trim('/');
+                        var redirectedResponse = await client.GetAsync(projectUrl);
+                        redirectedUrl = redirectedResponse.RequestMessage.RequestUri.ToString();
                     }
                     else
                     {
-                        Console.WriteLine($"-- Since projectUrl holds the URL of GitHub, process will use it.");
-                        repositoryUrlForApi = projectUrl.Split("github.com").Last().Trim('/');
+                        var redirectedResponse = await client.GetAsync(repositoryUrl);
+                        redirectedUrl = redirectedResponse.EnsureSuccessStatusCode().RequestMessage.RequestUri.ToString();
                     }
+
+                    if (!redirectedUrl.Contains("github.com"))
+                    {
+                        Console.WriteLine($"*** Repository URL :{redirectedUrl}.");
+                        Console.WriteLine("*** Only github URL is supported. Skip the process.");
+
+                        continue;
+                    }
+
+                    repositoryUrlForApi = redirectedUrl.Split("github.com").Last().Trim('/');
 
                     if (repositoryUrlForApi.EndsWith(".git"))
                     {
-                        Console.WriteLine($"--- Remove the .git at the end.");
-                        repositoryUrlForApi.Remove(repositoryUrlForApi.Length - 4);
+                        Console.WriteLine($"*** Remove the .git at the end.");
+                        repositoryUrlForApi = repositoryUrlForApi.Remove(repositoryUrlForApi.Length - 4);
                     }
 
-                    Console.WriteLine($"-- Successfully retrieved the gitHub URL. {repositoryUrlForApi}");
+                    if (repositoryUrlForApi.EndsWith("/wiki"))
+                    {
+                        Console.WriteLine($"*** Remove the wiki at the end.");
+                        repositoryUrlForApi = repositoryUrlForApi.Remove(repositoryUrlForApi.Length - 5);
+                    }
+
+                    Console.WriteLine($"** Successfully retrieved the gitHub URL. {repositoryUrlForApi}");
 
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
                     client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
 
                     foreach(var file in targetFiles)
                     {
+                        Thread.Sleep(500);
+
                         Console.WriteLine($"");
-                        Console.WriteLine($"--- Attempt to retrieve {file}.");
+                        Console.WriteLine($"*** Attempt to retrieve {file}.");
 
                         var requestUrl = gitHubApiRepoUrl + repositoryUrlForApi + $"/contents/{file}";
-                        Console.WriteLine($"--- Send Get request {requestUrl}.");
+                        Console.WriteLine($"*** Send Get request {requestUrl}.");
 
                         HttpResponseMessage response = await client.GetAsync(requestUrl);
 
@@ -197,19 +219,19 @@ namespace ListNugetLicense
                         {
                             if (response.StatusCode == HttpStatusCode.Forbidden)
                             {
-                                Console.WriteLine($"--- Response Status code :{response.StatusCode}.");
-                                Console.WriteLine($"--- Processing is terminated due to an adjustment error. Please use a personal token.");
+                                Console.WriteLine($"*** Response Status code :{response.StatusCode}.");
+                                Console.WriteLine($"*** Processing is terminated due to an adjustment error. Please use a personal token.");
                                 return;
                             }
 
+                            Console.WriteLine($"*** Response Status code :{response.StatusCode}.");
+                            Console.WriteLine($"*** Skip the process.");
 
-                            Console.WriteLine($"--- Response Status code :{response.StatusCode}.");
-                            Console.WriteLine($"--- Skip the process.");
                             continue;
                         }
 
                         Console.WriteLine($"");
-                        Console.WriteLine("-- Succeeded in retrieving the file.");
+                        Console.WriteLine("** Succeeded in retrieving the file.");
 
                         var contents = await JsonSerializer.DeserializeAsync<Contents>(await response.Content.ReadAsStreamAsync());
 
@@ -223,7 +245,8 @@ namespace ListNugetLicense
                         File.WriteAllText(Path.Combine(packageFolder, $"{file}"), decodedContent);
 
                         Console.WriteLine($"");
-                        Console.WriteLine($"-- {packageId} license file created or overwrited.");
+                        Console.WriteLine($"** {packageId} license file created or overwrited.");
+                        notFoundList.Remove(item.Key);
 
                         break;
                     }
@@ -231,13 +254,21 @@ namespace ListNugetLicense
 
                 Console.WriteLine($"");
                 Console.WriteLine($"=========================================================");
-                Console.WriteLine("- Completed! Press any key to exit...");
+                Console.WriteLine("* Completed! The following license files were not found.");
+
+                foreach(var item in notFoundList)
+                {
+                    Console.WriteLine($"** {item}.");
+                }
+
+                Console.WriteLine($"");
+                Console.WriteLine("* Press any key to exit...");
                 Console.ReadKey();
             }
             catch(Exception ex)
             {
-                //Console.WriteLine($"An error has occurred. Message:{ex.Message}");
-                Console.WriteLine("- Press any key to exit...");
+                Console.WriteLine($"An error has occurred. Message:{ex.Message}");
+                Console.WriteLine("* Press any key to exit...");
                 Console.ReadKey();
             }
         }
