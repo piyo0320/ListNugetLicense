@@ -30,7 +30,7 @@ namespace ListNugetLicense
             try
             {
                 Console.WriteLine("* Loading the configuration file.");
-
+                var outputFolderPath = appPath;
                 //
                 // Install the following packages
                 // - Microsoft.Extensions.Configuration
@@ -78,7 +78,21 @@ namespace ListNugetLicense
 
                 var token = appSettingConfiguration.GetChildren().Where(r => r.Key == "GithubToken").Single().Value;
 
-                client.DefaultRequestHeaders.Add("Authorization", $"token {token}");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    Console.WriteLine($"");
+                    Console.WriteLine("* Load github Token.");
+                    client.DefaultRequestHeaders.Add("Authorization", $"token {token}");
+                }
+
+                var outputFolderPathSetting = appSettingConfiguration.GetChildren().Where(r => r.Key == "OutputFolderPath").Single().Value;
+
+                if (!string.IsNullOrEmpty(outputFolderPathSetting))
+                {
+                    Console.WriteLine($"");
+                    Console.WriteLine($"* Load outputFolderPath {outputFolderPath}.");
+                    outputFolderPath = outputFolderPathSetting;
+                }
 
                 Console.WriteLine($"");
                 Console.WriteLine("* Load target files.");
@@ -241,7 +255,7 @@ namespace ListNugetLicense
 
                         // 結果を格納する
                         // パッケージ名のディレクトリを作成
-                        var packageFolder = Directory.CreateDirectory(Path.Combine(appPath, packageId)).ToString();
+                        var packageFolder = Directory.CreateDirectory(Path.Combine(outputFolderPath, packageId)).ToString();
                         File.WriteAllText(Path.Combine(packageFolder, $"{file}"), decodedContent);
 
                         Console.WriteLine($"");
