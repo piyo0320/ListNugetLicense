@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -98,21 +99,7 @@ namespace ListNugetLicense
                 Console.WriteLine("* Load target files.");
                 var targetFiles = appSettingConfiguration.GetSection("TargetFiles:FileName").Get<List<string>>();
 
-                if (targetFiles.Count == 0)
-                {
-                    Console.WriteLine("* There is no target. Terminate the process.");
-                    Console.WriteLine("* Press any key to exit...");
-                    Console.ReadKey();
-                    return;
-                }
-                else if ((targetFiles.Count > 60) && (string.IsNullOrEmpty(token)))
-                {
-                    Console.WriteLine("* Detected over 60 files. If you do not have a token, you will be trapped by the rate limit.");
-                    Console.WriteLine("* Put the token in appsetting.json.");
-                    Console.WriteLine("* Press any key to exit.");
-                    Console.ReadKey();
-                    return;
-                }
+                VerifyNeedToken(targetFiles, token);
 
                 var notFoundList = new List<string>();
                 Console.WriteLine("* The targets are as follows:");
@@ -150,6 +137,8 @@ namespace ListNugetLicense
                         Console.WriteLine($"** {name} {version}.");
                     }
                 }
+
+                VerifyNeedToken(packageDictionary.Select(r => r.Key).ToList(), token);
 
                 foreach (var item in packageDictionary)
                 {
@@ -200,17 +189,8 @@ namespace ListNugetLicense
 
                     repositoryUrlForApi = redirectedUrl.Split("github.com").Last().Trim('/');
 
-                    if (repositoryUrlForApi.EndsWith(".git"))
-                    {
-                        Console.WriteLine($"*** Remove the .git at the end.");
-                        repositoryUrlForApi = repositoryUrlForApi.Remove(repositoryUrlForApi.Length - 4);
-                    }
-
-                    if (repositoryUrlForApi.EndsWith("/wiki"))
-                    {
-                        Console.WriteLine($"*** Remove the wiki at the end.");
-                        repositoryUrlForApi = repositoryUrlForApi.Remove(repositoryUrlForApi.Length - 5);
-                    }
+                    repositoryUrlForApi = RemoveEndsWith(repositoryUrlForApi, ".git");
+                    repositoryUrlForApi = RemoveEndsWith(repositoryUrlForApi, "/wiki");
 
                     Console.WriteLine($"** Successfully retrieved the gitHub URL. {repositoryUrlForApi}");
 
@@ -284,6 +264,48 @@ namespace ListNugetLicense
                 Console.WriteLine($"An error has occurred. Message:{ex.Message}");
                 Console.WriteLine("* Press any key to exit...");
                 Console.ReadKey();
+            }
+        }
+
+        public static string RemoveEndsWith(string inputString ,string removeString)
+        {
+            if (string.IsNullOrEmpty(inputString))
+            {
+                return null;
+            }
+
+            string returnString = null;
+
+            if (inputString.EndsWith(removeString))
+            {
+                Console.WriteLine($"*** Remove \"{removeString}\" at the end.");
+                returnString = inputString.Remove(inputString.Length - removeString.Length);
+            }
+
+            return returnString;
+        }
+
+        /// <summary>
+        /// Terminate the process if it is trapped by rate limits.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="token"></param>
+        public static void VerifyNeedToken(List<string> list, string token)
+        {
+            if (list.Count() == 0)
+            {
+                Console.WriteLine("* There is no object. Terminate the process.");
+                Console.WriteLine("* Press any key to exit...");
+                Console.ReadKey();
+                return;
+            }
+            else if ((list.Count > 60) && (string.IsNullOrEmpty(token)))
+            {
+                Console.WriteLine("* Detected over 60 objects. If you do not have a token, you will be trapped by the rate limit.");
+                Console.WriteLine("* Put the token in appsetting.json.");
+                Console.WriteLine("* Press any key to exit.");
+                Console.ReadKey();
+                return;
             }
         }
     }
