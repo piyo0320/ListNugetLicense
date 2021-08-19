@@ -99,7 +99,23 @@ namespace ListNugetLicense
                 Console.WriteLine("* Load target files.");
                 var targetFiles = appSettingConfiguration.GetSection("TargetFiles:FileName").Get<List<string>>();
 
-                VerifyNeedToken(targetFiles, token);
+                if (targetFiles.Count == 0)
+                {
+                    Console.WriteLine("* There is no object. Terminate the process.");
+                    Console.WriteLine("* Press any key to exit...");
+                    Console.ReadKey();
+                    return;
+                }
+
+                var sleepMilliSecond = 500;
+                var needAdjustment = false;
+
+                needAdjustment = VerifyNeedAdjustments(targetFiles, token);
+
+                if (needAdjustment)
+                {
+                    sleepMilliSecond = 90 * 1000; // 90 sec
+                }
 
                 var notFoundList = new List<string>();
                 Console.WriteLine("* The targets are as follows:");
@@ -138,7 +154,20 @@ namespace ListNugetLicense
                     }
                 }
 
-                VerifyNeedToken(packageDictionary.Select(r => r.Key).ToList(), token);
+                if (packageDictionary.Count == 0)
+                {
+                    Console.WriteLine("* There is no package. Terminate the process.");
+                    Console.WriteLine("* Press any key to exit...");
+                    Console.ReadKey();
+                    return;
+                }
+
+                needAdjustment = VerifyNeedAdjustments(packageDictionary.Select(r => r.Key).ToList(), token);
+
+                if (needAdjustment)
+                {
+                    sleepMilliSecond = 90 * 1000; // 90 sec
+                }
 
                 foreach (var item in packageDictionary)
                 {
@@ -199,7 +228,7 @@ namespace ListNugetLicense
 
                     foreach(var file in targetFiles)
                     {
-                        Thread.Sleep(500);
+                        Thread.Sleep(sleepMilliSecond);
 
                         Console.WriteLine($"");
                         Console.WriteLine($"*** Attempt to retrieve {file}.");
@@ -274,7 +303,7 @@ namespace ListNugetLicense
                 return null;
             }
 
-            string returnString = null;
+            string returnString = inputString;
 
             if (inputString.EndsWith(removeString))
             {
@@ -286,27 +315,20 @@ namespace ListNugetLicense
         }
 
         /// <summary>
-        /// Terminate the process if it is trapped by rate limits.
+        /// Check to see if any adjustments are needed.
         /// </summary>
         /// <param name="list"></param>
         /// <param name="token"></param>
-        public static void VerifyNeedToken(List<string> list, string token)
+        public static bool VerifyNeedAdjustments(List<string> list, string token)
         {
-            if (list.Count() == 0)
+            // 正直もう10ファイルくらいで場合によっては調整エラーになる
+            if ((list.Count > 10) && (string.IsNullOrEmpty(token)))
             {
-                Console.WriteLine("* There is no object. Terminate the process.");
-                Console.WriteLine("* Press any key to exit...");
-                Console.ReadKey();
-                return;
+                Console.WriteLine("* Adjust the sense of the REST API call so that it does not exceed the rate.");
+                return true;
             }
-            else if ((list.Count > 60) && (string.IsNullOrEmpty(token)))
-            {
-                Console.WriteLine("* Detected over 60 objects. If you do not have a token, you will be trapped by the rate limit.");
-                Console.WriteLine("* Put the token in appsetting.json.");
-                Console.WriteLine("* Press any key to exit.");
-                Console.ReadKey();
-                return;
-            }
+
+            return false;
         }
     }
 }
