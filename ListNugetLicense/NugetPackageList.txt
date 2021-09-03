@@ -1,4 +1,5 @@
-﻿Microsoft.EntityFrameworkCore	5.0.9
+﻿System.IO.FileSystem	4.0.0
+Microsoft.EntityFrameworkCore	5.0.9
 Polly	7.2.2
 NLog	4.7.10
 AutoMapper	10.1.1
