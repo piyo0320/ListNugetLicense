@@ -21,7 +21,6 @@ namespace ListNugetLicense
         static readonly string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         static readonly string nugetUrl = "https://api.nuget.org/v3-flatcontainer/";
         static readonly string gitHubApiRepoUrl = "https://api.github.com/repos/";
-        static readonly XNamespace nuspecNamespace = "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd";
 
         // Get-Package | Select-Object Id, Version | Foreach-Object { "$($_.Id)`t$($_.Version)" }
         static readonly string InputFileName = "NugetPackageList.txt";
@@ -182,6 +181,7 @@ namespace ListNugetLicense
 
                     Console.WriteLine($"* Load package manifest.");
                     var nuspecXml = XDocument.Load(nugetUrl + $"{packageId}/{packageVersion}/{packageId}.nuspec");
+                    var nuspecNamespace = nuspecXml?.Root?.Name?.Namespace;
 
                     Console.WriteLine($"* Get project URL.");
                     var projectUrl = (string)nuspecXml.Root.Descendants(nuspecNamespace + "projectUrl").FirstOrDefault();
